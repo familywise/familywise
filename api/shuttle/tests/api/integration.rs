@@ -1,9 +1,8 @@
 use crate::prelude::*;
 use tracing::{info, trace};
 
-// #[tokio::test]
+#[tokio::test]
 async fn integration() {
-    info!("Local testing disabled.");
     let mut app = TestApp::new().await;
     info!("Checking local health.");
     check_local(&app).await;
