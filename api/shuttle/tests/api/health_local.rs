@@ -1,22 +1,17 @@
 use crate::prelude::*;
-use axum::{body::Body, http::Request};
-use tower::ServiceExt;
+use axum::http::StatusCode;
+use tracing::trace;
 
-#[tokio::test]
-async fn check_local() {
-    let app = TestApp::new().await;
+pub async fn check_local(app: &TestApp) {
     let response = app
-        .router()
-        .oneshot(
-            Request::builder()
-                .uri("/health")
-                .body(Body::empty())
-                .unwrap(),
-        )
+        .client_ref()
+        .get(format!("{}/health", LOCAL))
+        .send()
         .await
         .unwrap();
 
-    assert!(response.status().is_success());
+    trace!("{:#?}", &response);
+    assert_eq!(response.status(), StatusCode::OK);
     assert_eq!(
         api_lib::state::API_VERSION,
         response.headers()["family_server"]

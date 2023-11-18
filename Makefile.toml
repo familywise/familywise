@@ -11,7 +11,7 @@ workspace = false
 cwd = "./front"
 script_runner = "@shell"
 script = '''
-npx tailwindcss -i ./input.css -o ./public/tailwind.css --watch &
+npx tailwindcss -i ./input.css -o ./public/tailwind.css --watch
 '''
 
 [tasks.front-serve]
@@ -40,22 +40,22 @@ cp -r dist/* ../static
 
 [tasks.front]
 workspace = false
-run_task = { name = ["format", "front-build", "tailwinds", "front-serve"]}
+run_task = { name = ["format", "front-build", "front-serve"]}
 
 # local db
 [tasks.db-start]
 workspace = false
 script_runner = "@shell"
 script = '''
-docker run -d --name family-local -p 5432:5432 -e POSTGRES_PASSWORD=postgres -e POSTGRES_USER=postgres -e POSTGRES_DB=familyserver postgres
+docker run -d --name familywise -p 5432:5432 -e POSTGRES_PASSWORD=postgres -e POSTGRES_USER=postgres -e POSTGRES_DB=familywise postgres
 '''
 
 [tasks.db-stop]
 workspace = false
 script_runner = "@shell"
 script = '''
-docker stop family-local
-docker rm family-local
+docker stop familywise
+docker rm familywise
 '''
 
 # general tasks

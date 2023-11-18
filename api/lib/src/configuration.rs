@@ -114,6 +114,24 @@ impl DatabaseSettings {
             .expect("Failed to delete database.");
     }
 
+    pub async fn try_delete_db(&self) {
+        info!("Attempting to delete database {}.", &self.database_name);
+        let mut connection = PgConnection::connect_with(&self.without_db())
+            .await
+            .expect("Failed to connect to Postgres");
+        match connection
+            .execute(&*format!(r#"DROP DATABASE "{}";"#, self.database_name))
+            .await
+        {
+            Ok(_) => info!("Database {} deleted.", self.database_name),
+            Err(e) => info!(
+                "Failed to delete {}.  Error: {}.",
+                self.database_name,
+                e.to_string()
+            ),
+        }
+    }
+
     pub async fn configure_database(&self) -> PgPool {
         info!("Configuring database {}.", &self.database_name);
         let mut connection = PgConnection::connect_with(&self.without_db())

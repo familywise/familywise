@@ -3,7 +3,7 @@ use crate::prelude::*;
 use axum::extract::{Path, State};
 use axum::http::StatusCode;
 use axum::response::IntoResponse;
-use axum::routing::{get, post, Router};
+use axum::routing::{delete, get, post, Router};
 use axum::Json;
 use shared::prelude::*;
 use sqlx::PgPool;
@@ -115,7 +115,7 @@ impl FamilyUser for AppState {
         .await
         .map_err(|e| WiseError::DatabaseError {
             value: e.to_string(),
-        });
+        })?;
 
         Ok(user.clone())
     }
@@ -170,10 +170,9 @@ pub async fn create_user(
     Json(user): Json<serde_json::Value>,
 ) -> Result<impl IntoResponse, impl IntoResponse> {
     info!("Creating user {}.", &user["username"]);
-    let usr = User::new(
-        &user["username"].to_string(),
-        &user["password_hash"].to_string(),
-    );
+    let (_, username) = prune_name(&user["username"].to_string()).unwrap();
+    let (_, password) = prune_name(&user["password_hash"].to_string()).unwrap();
+    let usr = User::new(&username, &password);
     let user = data.create(&usr).await;
     match user {
         Ok(result) => Ok((StatusCode::CREATED, Json(result))),
@@ -186,10 +185,9 @@ pub async fn update_user(
     Json(user): Json<serde_json::Value>,
 ) -> Result<impl IntoResponse, impl IntoResponse> {
     info!("Updating user {}.", &user["username"]);
-    let mut usr = User::new(
-        &user["username"].to_string(),
-        &user["password_hash"].to_string(),
-    );
+    let (_, username) = prune_name(&user["username"].to_string()).unwrap();
+    let (_, password) = prune_name(&user["password_hash"].to_string()).unwrap();
+    let mut usr = User::new(&username, &password);
     let id: uuid::Uuid = serde_json::from_str(&user["id"].to_string()).unwrap();
     trace!("ID is: {}.", &id);
     {
@@ -206,11 +204,10 @@ pub async fn delete_user(
     State(data): State<Arc<AppState>>,
     Json(user): Json<serde_json::Value>,
 ) -> Result<impl IntoResponse, impl IntoResponse> {
-    tracing::info!("Deleting user {}.", &user["username"]);
-    let mut usr = User::new(
-        &user["username"].to_string(),
-        &user["password_hash"].to_string(),
-    );
+    info!("Deleting user {}.", &user["username"]);
+    let (_, username) = prune_name(&user["username"].to_string()).unwrap();
+    let (_, password) = prune_name(&user["password_hash"].to_string()).unwrap();
+    let mut usr = User::new(&username, &password);
     let id: uuid::Uuid = serde_json::from_str(&user["id"].to_string()).unwrap();
     trace!("ID is: {}.", &id);
     {

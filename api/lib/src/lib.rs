@@ -12,5 +12,5 @@ pub mod prelude {
     pub use crate::health::check;
     pub use crate::interface::user::{FamilyResult, FamilyUser};
     pub use crate::state::{AppState, API_VERSION};
-    pub use crate::utils::{prune_str, RandomUser};
+    pub use crate::utils::{name_part, prune_name, prune_str, RandomUser};
 }
