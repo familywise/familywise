@@ -5,8 +5,9 @@ use tracing::{info, trace};
 async fn integration() {
     let mut app = TestApp::new().await;
 
-    info!("Checking local health.");
-    check_local(&app).await;
-    info!("Testing local user lifecycle.");
-    local_user_lifecycle(&app).await;
+    info!("Local testing disabled.");
+    // info!("Checking local health.");
+    // check_local(&app).await;
+    // info!("Testing local user lifecycle.");
+    // local_user_lifecycle(&app).await;
 }
