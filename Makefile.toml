@@ -42,6 +42,10 @@ cp -r dist/* ../static
 workspace = false
 run_task = { name = ["format", "front-build", "front-serve"]}
 
+[tasks.back]
+workspace = false
+run_task = { name = ["format", "front-build", "api-run"]}
+
 # local db
 [tasks.db-start]
 workspace = false

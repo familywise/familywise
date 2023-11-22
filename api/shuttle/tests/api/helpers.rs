@@ -1,20 +1,8 @@
 use api_lib::prelude::*;
-use axum::body::Body;
-use axum::http::{Request, Response};
 use axum::routing::{get, post, Router};
-use fake::{Fake, Faker};
 use reqwest::Client;
 use secrecy::ExposeSecret;
-use shared::prelude::*;
-use tower::ServiceExt;
 use tracing::info;
-// use once_cell::sync::Lazy;
-
-pub fn new_user() -> User {
-    let username = Faker.fake::<String>();
-    let password_hash = Faker.fake::<String>();
-    User::new(&username, &password_hash)
-}
 
 pub const HOST: &str = "https://familywise.shuttleapp.rs";
 pub const LOCAL: &str = "http://localhost:8000";

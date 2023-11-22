@@ -10,7 +10,7 @@ pub fn Footer(cx: Scope) -> Element {
                 class: "container mx-auto flex flex-wrap p-0 flex-col md:flex-row justify-between items-center bg-inherit",
                 p {
                     class: "prose prose-gray prose-lg bg-inherit",
-                    "This is a footer 1."
+                    "This is a footer."
                 }
             }
         }

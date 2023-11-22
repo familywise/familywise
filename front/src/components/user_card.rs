@@ -1,4 +1,4 @@
-use crate::components::Button;
+use crate::prelude::*;
 // use axum::Json;
 use dioxus::prelude::*;
 use shared::prelude::*;
@@ -13,8 +13,11 @@ pub fn UserCard(
     // on_edit: EventHandler<'a, MouseEvent>,
     // on_delete: EventHandler<'a, MouseEvent>,
 ) -> Element {
-    let future = use_future(cx, (), |_| async move {
-        reqwest::get("http://localhost:8000/health")
+    // let env = use_shared_state::<Env>(cx).unwrap();
+    // let future = use_future(cx, (env,), |(env,)| async move {
+    //     reqwest::get(format!("{}/api/users/random", *env.read()))
+    let future = use_future(cx, (), |()| async move {
+        reqwest::get("https://familywise.shuttleapp.rs/api/users/random")
             .await
             .unwrap()
             .json::<User>()
@@ -22,15 +25,10 @@ pub fn UserCard(
     });
     log::info!("User card drawing.");
     cx.render(match future.value() {
-        // Some(Ok(Json(code))) => rsx! {
-        //     div {
-        //         format!("{:#?}", code)
-        //     }
-        // },
-        Some(Ok(res)) => rsx! {
+        Some(Ok(user)) => rsx! {
             div {
-                // format!("Response: {:#?}", res.status())
-                format!("Unrecognized body: {:#?}", res)
+                p { format!("Username: {}", user.username_ref()) }
+                p { format!("Password: {}", user.password_hash_ref()) }
             }
         },
         Some(Err(e)) => rsx! {
@@ -40,7 +38,7 @@ pub fn UserCard(
         },
         None => rsx! {
             div {
-                "No user found."
+                "Fetch of user failed."
             }
         },
     })
