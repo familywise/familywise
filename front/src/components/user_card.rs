@@ -4,20 +4,38 @@ use dioxus::prelude::*;
 use shared::prelude::*;
 // use shared::models::{user::User, ButtonType};
 
+#[derive(Props)]
+pub struct UserContent<'a> {
+    pub children: Element<'a>,
+}
+
+impl<'a> UserContent<'a> {
+    pub fn new(cx: Scope<'a>, user: &User) -> Self {
+        let children = cx.render(rsx!(
+        body {
+            class: "prose prose-gray prose-lg",
+            div {
+                p { format!("Username: {}", user.username_ref()) }
+                p { format!("Password: {}", user.password_hash_ref()) }
+            }
+        }
+              ));
+        Self { children }
+    }
+
+    pub fn children_ref(&self) -> &Element<'a> {
+        &self.children
+    }
+}
+
 #[inline_props]
 pub fn UserCard(
     cx: Scope,
-    // pub fn UserCard<'a>(
-    //     cx: Scope<'a>,
-    // user: &'a User,
     // on_edit: EventHandler<'a, MouseEvent>,
     // on_delete: EventHandler<'a, MouseEvent>,
 ) -> Element {
-    // let env = use_shared_state::<Env>(cx).unwrap();
-    // let future = use_future(cx, (env,), |(env,)| async move {
-    //     reqwest::get(format!("{}/api/users/random", *env.read()))
     let future = use_future(cx, (), |()| async move {
-        reqwest::get("https://familywise.shuttleapp.rs/api/users/random")
+        reqwest::get(format!("{}/api/users/random", HOST))
             .await
             .unwrap()
             .json::<User>()

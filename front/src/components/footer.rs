@@ -1,18 +1,17 @@
 use dioxus::prelude::*;
 
-pub fn Footer(cx: Scope) -> Element {
-    log::info!("Footer being drawn on blue background.");
+#[derive(Props)]
+pub struct FooterProps<'a> {
+    children: Element<'a>,
+}
+
+pub fn Footer<'a>(cx: Scope<'a, FooterProps<'a>>) -> Element {
+    log::info!("Footer drawing.");
     cx.render(rsx!(
         footer {
-            class: "bg-blue-300 shadow-md",
+            class: "sticky bottom-0",
             // class: "w-full h-16 p-2 box-border gap-6 flex flex-row justify-center items-center",
-            div {
-                class: "container mx-auto flex flex-wrap p-0 flex-col md:flex-row justify-between items-center bg-inherit",
-                p {
-                    class: "prose prose-gray prose-lg bg-inherit",
-                    "This is a footer."
+                &cx.props.children
                 }
-            }
-        }
     ))
 }

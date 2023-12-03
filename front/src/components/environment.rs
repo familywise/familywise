@@ -1,5 +1,8 @@
 use dioxus::prelude::*;
 
+pub const HOST: &str = "https://familywise.shuttleapp.rs";
+pub const LOCAL: &str = "http://127.0.0.1:8000";
+
 #[derive(Copy, Clone, PartialEq)]
 pub enum Env {
     Local,

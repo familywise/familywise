@@ -1,7 +1,9 @@
 #![allow(non_snake_case)]
 // Import the Dioxus prelude to gain access to the `rsx!` macro and the `Scope` and `Element` types.
 use dioxus::prelude::*;
+use dioxus_router::prelude::*;
 use front::prelude::*;
+use prefers_color_scheme::prefers_dark;
 use tracing::info;
 use wasm_logger;
 
@@ -13,21 +15,26 @@ fn main() {
     log::info!("Browser logging initiated in Dioxus.");
 }
 
-// Define a component that renders a div with the text "Hello, world!"
 fn App(cx: Scope) -> Element {
-    log::info!("Main body drawing.");
-
+    let theme = use_shared_state::<Theme>(cx);
+    if theme.is_none() {
+        let mut preference = Theme::Light;
+        if prefers_dark() {
+            preference = Theme::Dark;
+        }
+        use_shared_state_provider(cx, || preference);
+    }
+    let window_ref = web_sys::window();
+    match window_ref {
+        Some(window) => {
+            let ht = window.inner_height().unwrap().as_f64().unwrap();
+            use_shared_state_provider(cx, || ScreenHeight::new(ht));
+        }
+        None => {
+            use_shared_state_provider(cx, || ScreenHeight::new(50.0));
+        }
+    }
     cx.render(rsx! {
-            main {
-                class: "flex prose prose-xl justify-center p-3 bg-zinc-200",
-    // +       class: "relative z-0 bg-blue-100 w-screen h-auto min-h-screen flex flex-col justify-start items-stretch",
-                Card {}
-               Header {}
-               // section {
-               //     class: "bg-rose-300 md:container md:mx-auto md:py-8 flex-1",
-               // }
-               UserCard {}
-               Footer {}
-           }
-        })
+        Router::<Route> {}
+    })
 }

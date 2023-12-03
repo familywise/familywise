@@ -1,16 +1,16 @@
 use crate::prelude::*;
 use dioxus::prelude::*;
 
-pub fn Header(cx: Scope) -> Element {
+#[derive(Props)]
+pub struct HeaderProps<'a> {
+    children: Element<'a>,
+}
+
+pub fn Header<'a>(cx: Scope<'a, HeaderProps<'a>>) -> Element {
     cx.render(rsx!(
         header {
-            class: "sticky top-0 z-10 text-gray-400 bg-blue-300 body-font shadow-md",
-            div {
-                class: "container mx-auto flex flex-wrap p-0 flex-col md:flex-row justify-between items-center",
-                p { "This is a header." }
-                p { "Environment:"}
-                Environment {}
-            }
+            class: "sticky top-0",
+            &cx.props.children
         }
     ))
 }

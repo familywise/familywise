@@ -75,3 +75,11 @@ workspace = false
 install_crate = "rustfmt"
 command = "cargo"
 args = ["fmt", "--all"] #, "--", "--check"]
+
+[tasks.git-push]
+workspace = false
+script_runner = "@shell"
+script = '''
+GIT_SSH_COMMAND="ssh -i ~/.ssh/id_dev" git push
+'''
+
