@@ -24,6 +24,7 @@ impl Theme {
                 let theme = *value.read();
                 match aspect {
                     "background" => class.push_str(&theme.background()),
+                    "button" => class.push_str(&theme.button()),
                     "center" => class.push_str(&theme.center()),
                     "input" => class.push_str(&theme.input()),
                     _ => {}
@@ -49,6 +50,7 @@ impl fmt::Display for Theme {
 
 pub trait Aspect {
     fn background(&self) -> String;
+    fn button(&self) -> String;
     fn center(&self) -> String;
     fn input(&self) -> String;
 }
@@ -61,6 +63,19 @@ impl Aspect for Theme {
             }
             Self::Dark => {
                 "min-h-screen max-w-full bg-gradient-to-r from-zinc-700 via-zinc-900 to-zinc-800 text-slate-100 divide-y divide-zinc-500".to_string()
+            }
+        }
+    }
+
+    fn button(&self) -> String {
+        match self {
+            Self::Light => {
+                "bg-blue-300 rounded-full border-2 border-slate-700 shadow shadow-slate-700"
+                    .to_string()
+            }
+            Self::Dark => {
+                "my-1 bg-gradient-to-r from-slate-200 to-slate-50 px-2 rounded-full text-zinc-900"
+                    .to_string()
             }
         }
     }
