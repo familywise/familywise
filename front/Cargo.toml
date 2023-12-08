@@ -18,6 +18,7 @@ log.workspace = true
 prefers-color-scheme.workspace = true
 reqwest.workspace = true
 shared = { path = "../shared" }
+thiserror.workspace = true
 tracing.workspace = true
 wasm-logger.workspace = true
 web-sys.workspace = true

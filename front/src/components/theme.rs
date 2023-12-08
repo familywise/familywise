@@ -9,6 +9,19 @@ pub enum Theme {
 }
 
 impl Theme {
+    pub fn add(items: &Vec<String>) -> String {
+        let mut res = "".to_string();
+        let mut i = 0;
+        for item in items {
+            res.push_str(item);
+            i += 1;
+            if i < res.len() {
+                res.push_str(" ");
+            }
+        }
+        res
+    }
+
     pub fn next(&self) -> Self {
         match self {
             Self::Light => Self::Dark,
@@ -26,7 +39,9 @@ impl Theme {
                     "background" => class.push_str(&theme.background()),
                     "button" => class.push_str(&theme.button()),
                     "center" => class.push_str(&theme.center()),
+                    "column" => class.push_str(&theme.column()),
                     "input" => class.push_str(&theme.input()),
+                    "m3" => class.push_str(&theme.input()),
                     _ => {}
                 }
                 log::trace!("Theme set.");
@@ -52,7 +67,10 @@ pub trait Aspect {
     fn background(&self) -> String;
     fn button(&self) -> String;
     fn center(&self) -> String;
+    fn column(&self) -> String;
     fn input(&self) -> String;
+    fn m3(&self) -> String;
+    fn p3(&self) -> String;
 }
 
 impl Aspect for Theme {
@@ -70,21 +88,22 @@ impl Aspect for Theme {
     fn button(&self) -> String {
         match self {
             Self::Light => {
-                "bg-blue-300 rounded-full border-2 border-slate-700 shadow shadow-slate-700"
+                "my-1 px-2 bg-gradient-to-r from-blue-300 via-blue-200 to-blue-300 rounded-full shadow shadow-zinc-700"
                     .to_string()
             }
             Self::Dark => {
-                "my-1 bg-gradient-to-r from-slate-200 to-slate-50 px-2 rounded-full text-zinc-900"
+                "my-1 px-2 bg-gradient-to-r from-slate-300 via-slate-100 to-slate-300 rounded-full shadow shadow-slate-300 text-zinc-900"
                     .to_string()
             }
         }
     }
 
+    fn column(&self) -> String {
+        "flex flex-col px-2 m-3 space-y-4".to_string()
+    }
+
     fn center(&self) -> String {
-        match self {
-            Self::Light => "p-3 flex flex-row justify-center".to_string(),
-            Self::Dark => "p-3 flex flex-row justify-center".to_string(),
-        }
+        "flex flex-row justify-center".to_string()
     }
 
     fn input(&self) -> String {
@@ -92,5 +111,13 @@ impl Aspect for Theme {
             Self::Light => "mx-3 px-2 bg-slate-300".to_string(),
             Self::Dark => "mx-3 px-2 bg-zinc-600".to_string(),
         }
+    }
+
+    fn m3(&self) -> String {
+        "m-3".to_string()
+    }
+
+    fn p3(&self) -> String {
+        "p-3".to_string()
     }
 }

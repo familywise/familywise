@@ -8,7 +8,7 @@ pub struct DarkModeProps<'a> {
 }
 
 pub fn DarkModeButton<'a>(cx: Scope<'a, DarkModeProps<'a>>) -> Element<'a> {
-    log::info!("Dark mode button drawing.");
+    log::trace!("Dark mode button drawing.");
     let theme = use_shared_state::<Theme>(cx);
     let mut msg = "".to_string();
     match theme {

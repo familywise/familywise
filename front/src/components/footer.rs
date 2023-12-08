@@ -6,7 +6,7 @@ pub struct FooterProps<'a> {
 }
 
 pub fn Footer<'a>(cx: Scope<'a, FooterProps<'a>>) -> Element {
-    log::info!("Footer drawing.");
+    log::trace!("Footer drawing.");
     cx.render(rsx!(
         footer {
             class: "sticky bottom-0",
