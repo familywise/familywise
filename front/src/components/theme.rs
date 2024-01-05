@@ -108,8 +108,8 @@ impl Aspect for Theme {
 
     fn input(&self) -> String {
         match self {
-            Self::Light => "mx-3 px-2 bg-slate-300".to_string(),
-            Self::Dark => "mx-3 px-2 bg-zinc-600".to_string(),
+            Self::Light => "mx-3 px-2 bg-slate-300 basis-1/6".to_string(),
+            Self::Dark => "mx-3 px-2 bg-zinc-600 basis-1/6".to_string(),
         }
     }
 

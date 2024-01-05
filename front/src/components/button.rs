@@ -1,6 +1,7 @@
 #![allow(non_snake_case)]
 use crate::prelude::*;
 use dioxus::prelude::*;
+use shared::prelude::*;
 use std::fmt;
 
 pub enum ButtonType {
@@ -36,8 +37,6 @@ struct InputButtonProps<'a> {
     #[props(into)]
     #[props(default="p-3 flex flex-row justify-center".to_string())]
     button: String,
-    #[props(into)]
-    username: String,
     on_click: EventHandler<'a, MouseEvent>,
 }
 
@@ -58,16 +57,116 @@ pub struct InputButtonParams {
     password: String,
 }
 
+fn users_endpoint() -> String {
+    let window = web_sys::window().expect("No window found.");
+    let location = window.location();
+    let host = location.host().expect("No host found.");
+    let protocol = location.protocol().expect("No protocol found.");
+    let api = "api".to_string();
+    let endpoint = format!("{}//{}/{}", protocol, host, api);
+    format!("{}/users", endpoint)
+}
+
 pub fn InputButton(cx: Scope<InputButtonParams>) -> Element {
+    let user_input = move |user: User| {
+        cx.spawn({
+            async move {
+                let client = reqwest::Client::new();
+                let mut headers = reqwest::header::HeaderMap::new();
+                headers.insert(
+                    reqwest::header::CONTENT_TYPE,
+                    "application/json".parse().unwrap(),
+                );
+                let response = client
+                    .post(&users_endpoint())
+                    .headers(headers)
+                    .json(&user)
+                    .send()
+                    .await
+                    .expect("after send")
+                    .json::<User>()
+                    .await;
+                match response {
+                    Ok(user) => {
+                        log::info!("User created: {:#?}", &user);
+                    }
+                    Err(e) => {
+                        log::info!("Error: {}", e.to_string());
+                    }
+                }
+            }
+        })
+    };
     let theme = use_shared_state::<Theme>(cx);
     let button = Theme::get(&theme, "button");
+    let get_user = User::new(cx.props.username.as_str(), cx.props.password.as_str());
+    log::info!("Working user values: {:#?}", &get_user);
+
     cx.render(rsx!(InputButtonInner {
         button: button,
-        username: &cx.props.username,
         on_click: move |evt| {
             log::trace!("{:#?}", &evt);
-            log::info!("Username: {}", &cx.props.username);
-            log::info!("Password: {}", &cx.props.password);
+            log::info!("Username: {}", get_user.username_ref());
+            log::info!("Password: {}", get_user.password_hash_ref());
+            user_input(get_user.clone());
+            // match input_user(cx) {
+            //     Ok(user_result) => log::info!("User created {:#?}", user_result),
+            //     Err(e) => log::info!("Error: {}", e.to_string()),
+            // }
         },
     }))
+}
+
+pub fn input_user(cx: Scope<InputButtonParams>) -> ClientResult<User> {
+    let mut user = User::new(cx.props.username.as_str(), cx.props.password.as_str());
+    let future = use_future(cx, (&user,), |user| async move {
+        log::info!("Passing user to client: {:#?}", &user);
+        let client = reqwest::Client::new();
+        let mut headers = reqwest::header::HeaderMap::new();
+        headers.insert(
+            reqwest::header::CONTENT_TYPE,
+            "application/json".parse().unwrap(),
+        );
+
+        let res = client
+            .post(&format!("http://127.0.0.1:8000/api/users"))
+            .headers(headers)
+            .json(&user)
+            .send()
+            .await
+            .expect("after send")
+            .json::<User>()
+            .await
+            .expect("after deserializing to json");
+        log::info!("Response is {:#?}", &res);
+        res
+    });
+
+    match future.value() {
+        Some(user_result) => {
+            user.set_id(user_result.id());
+            log::info!("Passing user to gui: {:#?}", &user);
+            Ok(user)
+        }
+        None => Err(ClientError::UnknownError),
+    }
+}
+
+#[derive(Props)]
+pub struct RandomUserButtonProps<'a> {
+    #[props(into)]
+    #[props(default="p-3 flex flex-row justify-center".to_string())]
+    button: String,
+    on_click: EventHandler<'a, MouseEvent>,
+    msg: &'a str,
+}
+
+pub fn RandomUserButton<'a>(cx: Scope<'a, RandomUserButtonProps<'a>>) -> Element {
+    cx.render(rsx!(
+    button {
+        class: cx.props.button.as_str(),
+        onclick: move |event| cx.props.on_click.call(event),
+        cx.props.msg
+    }
+              ))
 }

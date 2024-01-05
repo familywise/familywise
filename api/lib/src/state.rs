@@ -1,6 +1,7 @@
 use super::interface::user::{FamilyResult, FamilyUser};
 use crate::prelude::*;
 use axum::extract::{Path, State};
+use axum::http::header::ACCESS_CONTROL_ALLOW_HEADERS;
 use axum::http::StatusCode;
 use axum::response::IntoResponse;
 use axum::routing::{delete, get, post, Router};
@@ -40,7 +41,12 @@ impl AppState {
                 "/api/users/:id",
                 get(get_user).put(update_user).delete(delete_user),
             )
-            .route("/api/users/random", get(random_user))
+            .route(
+                "/api/users/random",
+                get(random_user).post(create_random_user),
+            )
+            .route("/api/users/random/username", get(random_username))
+            .route("/api/users/random/password", get(random_password))
             .nest_service("/", ServeDir::new("static"))
             .with_state(app_state)
     }
@@ -169,14 +175,42 @@ pub async fn create_user(
     State(data): State<Arc<AppState>>,
     Json(user): Json<serde_json::Value>,
 ) -> Result<impl IntoResponse, impl IntoResponse> {
-    info!("Creating user {}.", &user["username"]);
-    let (_, username) = prune_name(&user["username"].to_string()).unwrap();
-    let (_, password) = prune_name(&user["password_hash"].to_string()).unwrap();
-    let usr = User::new(&username, &password);
-    let user = data.create(&usr).await;
-    match user {
-        Ok(result) => Ok((StatusCode::CREATED, Json(result))),
-        Err(e) => Err((StatusCode::BAD_REQUEST, e.to_string())),
+    info!("Receiving request to create {:#?}", &user);
+    // let user_deref: User = user;
+    match user.clone() {
+        serde_json::Value::Array(user_vec) => {
+            if !user_vec.is_empty() {
+                info!("Creating user {:#?}.", &user_vec[0].get("username"));
+                let (_, username) = prune_name(&user_vec[0]["username"].to_string()).unwrap();
+                let (_, password) = prune_name(&user_vec[0]["password_hash"].to_string()).unwrap();
+                let usr = User::new(&username, &password);
+                // let usr = User::new(
+                //     user_vec[0]["username"].to_string().as_str(),
+                //     &user_vec[0]["password"].to_string().as_str(),
+                // );
+                match data.create(&usr).await {
+                    Ok(result) => Ok((StatusCode::CREATED, Json(result))),
+                    Err(e) => Err((StatusCode::BAD_REQUEST, e.to_string())),
+                }
+            } else {
+                Err((StatusCode::BAD_REQUEST, "User not created.".to_string()))
+            }
+        }
+        serde_json::Value::Object(user_map) => {
+            info!("Creating user {:#?}.", &user_map["username"]);
+            let (_, username) = prune_name(&user_map["username"].to_string()).unwrap();
+            let (_, password) = prune_name(&user_map["password_hash"].to_string()).unwrap();
+            let usr = User::new(&username, &password);
+            let user = data.create(&usr).await;
+            match user {
+                Ok(result) => Ok((StatusCode::CREATED, Json(result))),
+                Err(e) => Err((StatusCode::BAD_REQUEST, e.to_string())),
+            }
+        }
+        _ => {
+            info!("Not an array.");
+            Err((StatusCode::BAD_REQUEST, "Not an array.".to_string()))
+        }
     }
 }
 
@@ -220,7 +254,35 @@ pub async fn delete_user(
     }
 }
 
-pub async fn random_user(
+pub async fn random_username() -> impl IntoResponse {
+    let mut username = "".to_string();
+    {
+        let mut gen = RandomUser::new();
+        username.push_str(&gen.username());
+    }
+    (StatusCode::CREATED, Json(username))
+}
+
+pub async fn random_password() -> impl IntoResponse {
+    let mut password = "".to_string();
+    {
+        let gen = RandomUser::new();
+        password.push_str(&gen.password());
+    }
+    (StatusCode::CREATED, Json(password))
+}
+
+pub async fn random_user(State(data): State<Arc<AppState>>) -> impl IntoResponse {
+    let mut user = User::new("user", "password");
+    {
+        let mut gen = RandomUser::new();
+        user.set_username(&gen.username());
+        user.set_password_hash(&gen.password());
+    }
+    (StatusCode::CREATED, Json(user))
+}
+
+pub async fn create_random_user(
     State(data): State<Arc<AppState>>,
 ) -> Result<impl IntoResponse, impl IntoResponse> {
     let mut user = User::new("user", "password");
@@ -232,7 +294,11 @@ pub async fn random_user(
     info!("Creating random user {}.", user.username_ref());
     let user = data.create(&user).await;
     match user {
-        Ok(result) => Ok((StatusCode::CREATED, Json(result))),
+        Ok(result) => Ok((
+            StatusCode::CREATED,
+            [(ACCESS_CONTROL_ALLOW_HEADERS, "*")],
+            Json(result),
+        )),
         Err(WiseError::DatabaseError { value }) => Err((StatusCode::BAD_REQUEST, value)),
         Err(e) => Err((StatusCode::BAD_REQUEST, e.to_string())),
     }

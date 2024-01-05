@@ -17,8 +17,13 @@ dioxus-web.workspace = true
 log.workspace = true
 prefers-color-scheme.workspace = true
 reqwest.workspace = true
+serde_json.workspace = true
 shared = { path = "../shared" }
 thiserror.workspace = true
 tracing.workspace = true
 wasm-logger.workspace = true
 web-sys.workspace = true
+uuid.workspace = true
+instant.workspace = true
+gloo-timers = "0.3.0"
+wasmtimer = "0.2.0"

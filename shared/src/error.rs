@@ -1,12 +1,12 @@
 //! Error handling module for the client.
 //!
-//! Creates a custom Error type `ClientError`, and an alias
-//! for Result using the `ClientError`, called `ClientResult`.
+//! Creates a custom Error type `SharedError`, and an alias
+//! for Result using the `SharedError`, called `SharedResult`.
 
-/// The ClientError enum takes failure types from different libraries and converts them to a variant
-/// of ClientError using the framework from the thiserror library.
+/// The SharedError enum takes failure types from different libraries and converts them to a variant
+/// of SharedError using the framework from the thiserror library.
 #[derive(thiserror::Error, Debug)]
-pub enum ClientError {
+pub enum SharedError {
     /// Error returned from local builder pattern.
     #[error("Value not provided for {value:?}.")]
     UserBuildError {
@@ -41,4 +41,4 @@ pub enum ClientError {
 }
 
 /// Alias for the Result type using the local Error type.
-pub type ClientResult<T> = Result<T, ClientError>;
+pub type SharedResult<T> = Result<T, SharedError>;
