@@ -10,6 +10,4 @@ pub enum Route {
     Home {},
     #[route("/login")]
     Login {},
-    #[route("/:..segments")]
-    NotFound { segments: Vec<String> },
 }

@@ -1,78 +1,38 @@
-use api_lib::prelude::*;
-use axum::routing::{get, post, Router};
-use reqwest::Client;
-use secrecy::ExposeSecret;
-use tracing::info;
+use axum::body::Body;
+use cordial::prelude::{Host, Polite};
+use hyper_util::client::legacy::connect::HttpConnector;
+use hyper_util::client::legacy::Client;
 
 pub const HOST: &str = "https://familywise.shuttleapp.rs";
 pub const LOCAL: &str = "http://localhost:8000";
 
 #[derive(Clone)]
-pub struct TestClient {
-    client: reqwest::Client,
+pub struct Voice {
+    pub client: reqwest::Client,
 }
 
-impl TestClient {
+impl Voice {
     pub fn new() -> Self {
         Self {
-            client: Client::builder()
+            client: reqwest::Client::builder()
                 .redirect(reqwest::redirect::Policy::none())
                 .cookie_store(true)
                 .build()
                 .unwrap(),
         }
     }
-
-    pub fn client(&self) -> &Client {
-        &self.client
-    }
-
-    pub fn client_mut(&mut self) -> &mut Client {
-        &mut self.client
-    }
 }
 
-/// The `TestApp` struct
 #[derive(Clone)]
-pub struct TestApp {
-    router: Router,
-    pub client: TestClient,
+pub struct WildHost {
+    pub host: Host,
+    pub voice: Client<HttpConnector, Body>,
 }
 
-impl TestApp {
-    pub async fn new() -> Self {
-        if let Ok(()) = tracing_subscriber::fmt()
-            .with_max_level(tracing::Level::INFO)
-            .try_init()
-        {};
-        let settings = DatabaseSettings::from_env().unwrap();
-        info!(
-            "Connection: {}",
-            &settings.connection_string().expose_secret()
-        );
-        settings.try_delete_db().await;
-        settings.create_db().await;
-        let db_pool = settings.get_connection_pool();
-        let router = AppState::new(db_pool).app();
-        let client = TestClient::new();
-        TestApp { router, client }
-    }
-
-    pub fn router(&self) -> Router {
-        self.router.clone()
-    }
-
-    pub fn client_ref(&self) -> &Client {
-        self.client.client()
-    }
-
-    pub async fn create_db(&self) {
-        let settings = DatabaseSettings::from_env().unwrap();
-        settings.create_db().await;
-    }
-
-    pub async fn delete_db(&self) {
-        let settings = DatabaseSettings::from_env().unwrap();
-        settings.delete_db().await;
+impl WildHost {
+    pub async fn from_env() -> Polite<Self> {
+        let host = Host::from_env().await?;
+        let voice = Client::builder(hyper_util::rt::TokioExecutor::new()).build_http();
+        Ok(Self { host, voice })
     }
 }

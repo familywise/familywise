@@ -1,6 +1,5 @@
 [workspace]
 members = [
-    "api/lib",
     "api/shuttle",
     "front",
     "shared"
@@ -9,16 +8,15 @@ resolver = "1"
 
 [workspace.dependencies]
 anyhow = "1.0.75"
-api-lib = { path = "./api/lib" }
-async-trait = "0.1.74"
-axum = { version = "0.6.20", features = ["tracing", "macros", "headers"] }
-axum-server = { version = "0.5.1", features = ["tokio-rustls"] }
+async-trait = "0.1.77"
+axum = { version = "0.7.3", features = ["tracing", "macros"] }
+axum-server = { version = "0.6.0", features = ["tokio-rustls"] }
 dioxus = "0.4.0"
 dioxus-router = "0.4.1"
 dioxus-web = "0.4.0"
 dotenvy = "0.15.7"
 fake = { version = "2.9.1", features = ["uuid", "serde_json", "derive"] }
-hyper = "0.14.27"
+hyper = "1.1.0"
 instant = { version = "0.1.12", features = ["now", "wasm-bindgen"] }
 log = "0.4.20"
 names = "0.14.0"
@@ -30,16 +28,17 @@ secrecy = { version = "0.8.0", features = ["serde"] }
 serde = { version = "1.0.189", features = ["derive"]}
 serde-aux = "4.2.0"
 serde_json = "1.0.107"
-shuttle-axum = "0.35.2"
-shuttle-runtime = "0.35.2"
-shuttle-secrets = "0.35.2"
-shuttle-service = { version = "0.35.2", features = ["tokio"] }
-shuttle-shared-db = { version = "0.35.2", features = ["postgres-rustls", "sqlx"] }
+shuttle-axum = "0.39.0"
+shuttle-runtime = "0.39.0"
+shuttle-secrets = "0.39.0"
+shuttle-service = { version = "0.39.0", features = ["tokio"] }
+shuttle-shared-db = { version = "0.39.0", features = ["postgres", "sqlx"] }
 sqlx = { version = "0.7.1", features = ["runtime-tokio-rustls", "postgres", "macros", "chrono", "uuid"] }
 thiserror = "1.0.50"
 tokio = { version = "1.28.2", features = ["fs", "tracing"] }
 tower = { version = "0.4.13", features = ["tracing", "tokio"] }
-tower-http = { version = "0.4.4", features = ["fs", "tracing", "tokio"] }
+tower-http = { version = "0.5.0", features = ["fs", "tracing", "tokio"] }
+# tower-http = { version = "0.4.4", features = ["fs", "tracing", "tokio"] }
 tracing = "0.1.37"
 tracing-subscriber = "0.3.17"
 uuid = { version = "1.5.0", features = ["js", "v4"] }

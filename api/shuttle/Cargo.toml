@@ -5,9 +5,9 @@ edition = "2021"
 
 [dependencies]
 anyhow = { workspace = true }
-api-lib = { workspace = true }
 axum = { workspace = true }
 axum-server.workspace = true 
+cordial = { path = "../../../cordial" }
 fake.workspace = true 
 reqwest.workspace = true
 shared = { path = "../../shared", features = ["backend"] }
@@ -23,8 +23,13 @@ tokio = { workspace = true }
 tracing = { workspace = true }
 tracing-subscriber = { workspace = true }
 uuid = { workspace = true }
-# mime = "0.3.17"
+
 [dev-dependencies]
 hyper = "0.14.27"
 tower = { version = "0.4.13", features = ["tracing", "tokio"] }
+mime = "0.3.17"
+hyper-util = { version = "0.1.3", features = ["client-legacy"] }
+hyper-http-connector = "0.1.0"
+polite = { path = "../../../cordial/polite", default-features = false, features = ["serial", "sql", "hype"] }
+http-body-util = "0.1.0"
 

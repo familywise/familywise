@@ -3,10 +3,13 @@ fn api_endpoint() -> String {
     let location = window.location();
     let host = location.host().expect("No host found.");
     let protocol = location.protocol().expect("No protocol found.");
-    let api = "api".to_string();
-    format!("{}//{}/{}", protocol, host, api)
+    format!("{}//{}", protocol, host)
 }
 
-pub fn users_endpoint() -> String {
-    format!("{}/users", api_endpoint())
+pub fn guests_endpoint() -> String {
+    format!("{}/guests", api_endpoint())
+}
+
+pub fn improv_endpoint() -> String {
+    format!("{}/improv", api_endpoint())
 }

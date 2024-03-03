@@ -19,7 +19,7 @@ fn LoginContent(cx: Scope<LoginContentProps>) -> Element {
     div {
         class: cx.props.class.as_str(),
         MenuItems {}
-        UserForm {}
+        GuestForm {}
         Footer { "This is the login page." }
     }
       ))

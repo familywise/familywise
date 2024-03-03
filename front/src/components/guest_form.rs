@@ -1,10 +1,11 @@
 #![allow(non_snake_case)]
 use crate::prelude::*;
+use cordial_guest::Guest;
 use dioxus::prelude::*;
-use shared::prelude::*;
+use polite::{FauxPas, Polite};
 
 #[derive(Props)]
-pub struct UserFormProps<'a> {
+pub struct GuestFormProps<'a> {
     #[props(into)]
     #[props(default="p-3 flex flex-row justify-center".to_string())]
     button: String,
@@ -23,28 +24,28 @@ pub struct UserFormProps<'a> {
 }
 
 #[component]
-fn UserFormOptions(
+fn GuestFormOptions(
     cx: Scope,
     name: UseState<String>,
     pass: UseState<String>,
     visible: UseState<bool>,
 ) -> Element {
-    let get_user = use_state(cx, || ());
+    let get_guest = use_state(cx, || ());
     {
         let name = name.clone();
         let pass = pass.clone();
-        use_effect(cx, get_user, |_| async move {
-            let user = get_random_user().await;
-            name.set(user.username());
-            pass.set(user.password_hash());
+        use_effect(cx, get_guest, |_| async move {
+            let guest = get_random_guest().await;
+            name.set(guest.name);
+            pass.set(guest.hash);
         })
     }
 
-    let get_username = use_state(cx, || ());
+    let get_guest_name = use_state(cx, || ());
     {
         let name = name.clone();
-        use_effect(cx, get_username, |_| async move {
-            match get_random_username().await {
+        use_effect(cx, get_guest_name, |_| async move {
+            match get_random_name().await {
                 Ok(val) => {
                     name.set(val);
                 }
@@ -55,11 +56,11 @@ fn UserFormOptions(
         })
     }
 
-    let get_password = use_state(cx, || ());
+    let get_guest_pass = use_state(cx, || ());
     {
         let pass = pass.clone();
-        use_effect(cx, get_password, |_| async move {
-            let password = get_random_password().await;
+        use_effect(cx, get_guest_pass, |_| async move {
+            let password = get_random_pass().await;
             pass.set(password);
         })
     }
@@ -82,21 +83,21 @@ fn UserFormOptions(
     button {
         class: "rounded-full border-2 border-red-300 shrink px-2",
         onclick: move |_| {
-            get_username.set(());
+            get_guest_name.set(());
         },
         "Name"
     }
     button {
         class: "rounded-full border-2 border-red-300 shrink px-2",
         onclick: move |_| {
-            get_password.set(());
+            get_guest_pass.set(());
         },
         "Pass"
     }
     button {
         class: "rounded-full border-2 border-red-300 shrink px-2",
         onclick: move |_| {
-            get_user.set(());
+            get_guest.set(());
         },
         "Both"
     }
@@ -104,8 +105,8 @@ fn UserFormOptions(
               ))
 }
 
-pub fn UserForm(cx: Scope) -> Element {
-    log::info!("Drawing user form.");
+pub fn GuestForm(cx: Scope) -> Element {
+    log::info!("Drawing guest form.");
     let theme = use_shared_state::<Theme>(cx);
     let button = Theme::get(&theme, "button");
     let center = Theme::get(&theme, "center");
@@ -121,7 +122,7 @@ pub fn UserForm(cx: Scope) -> Element {
     cx.render(rsx!(
         div {
             class: "flex flex-row justify-center",
-            UserFormInner {
+            GuestFormInner {
             button: button,
             center: center,
             column: column,
@@ -153,7 +154,7 @@ pub fn UserForm(cx: Scope) -> Element {
                     } else {
                         "true"
                     },
-                    UserFormOptions { name: name.clone(), pass: pass.clone(), visible: see_pass.clone(), }
+                    GuestFormOptions { name: name.clone(), pass: pass.clone(), visible: see_pass.clone(), }
                 }
             }
         }
@@ -161,7 +162,7 @@ pub fn UserForm(cx: Scope) -> Element {
     ))
 }
 
-fn UserFormInner<'a>(cx: Scope<'a, UserFormProps<'a>>) -> Element {
+fn GuestFormInner<'a>(cx: Scope<'a, GuestFormProps<'a>>) -> Element {
     let draft_name = use_state(cx, || "".to_string());
     {
         let draft_name = draft_name.clone();
@@ -236,31 +237,28 @@ fn UserFormInner<'a>(cx: Scope<'a, UserFormProps<'a>>) -> Element {
     ))
 }
 
-async fn get_random_user() -> User {
-    let path = format!("{}/random", guests_endpoint());
-    log::info!("Getting random user from {}", &path);
-    reqwest::get(&path)
-        .await
-        .unwrap()
-        .json::<User>()
-        .await
-        .unwrap()
+async fn get_random_guest() -> Guest {
+    let name = get_random_name().await.unwrap();
+    let pass = get_random_pass().await;
+    Guest::new(&name, &pass)
 }
 
-async fn get_random_username() -> ClientResult<String> {
-    let path = format!("{}/random/username", guests_endpoint());
-    log::info!("Getting random username from {}", &path);
+async fn get_random_name() -> Polite<String> {
+    let path = format!("{}/improv/name", LOCAL);
+    // let path = format!("{}/name", improv_endpoint());
+    log::info!("Getting random name from {}", &path);
     match reqwest::get(&path).await?.json::<String>().await {
         Ok(response) => Ok(response),
         Err(e) => {
             log::info!("{}", e.to_string());
-            Err(ClientError::UnknownError)
+            Err(FauxPas::Unknown)
         }
     }
 }
 
-async fn get_random_password() -> String {
-    let path = format!("{}/random/password", guests_endpoint());
+async fn get_random_pass() -> String {
+    // let path = format!("{}/name", improv_endpoint());
+    let path = format!("{}/improv/pass", LOCAL);
     log::info!("Getting random password from {}", &path);
     reqwest::get(&path)
         .await

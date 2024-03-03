@@ -2,7 +2,7 @@
 use crate::prelude::*;
 use dioxus::prelude::*;
 
-#[inline_props]
+#[component]
 pub fn NotFound(cx: Scope, segments: Vec<String>) -> Element {
     let theme_ref = use_shared_state::<Theme>(cx);
     match theme_ref {

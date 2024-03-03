@@ -18,7 +18,7 @@ impl fmt::Display for ButtonType {
     }
 }
 
-#[inline_props]
+#[component]
 pub fn Button<'a>(
     cx: Scope<'a>,
     button_type: ButtonType,
@@ -57,16 +57,6 @@ pub struct InputButtonParams {
     password: String,
 }
 
-fn users_endpoint() -> String {
-    let window = web_sys::window().expect("No window found.");
-    let location = window.location();
-    let host = location.host().expect("No host found.");
-    let protocol = location.protocol().expect("No protocol found.");
-    let api = "api".to_string();
-    let endpoint = format!("{}//{}/{}", protocol, host, api);
-    format!("{}/users", endpoint)
-}
-
 pub fn InputButton(cx: Scope<InputButtonParams>) -> Element {
     let user_input = move |user: User| {
         cx.spawn({
@@ -78,7 +68,7 @@ pub fn InputButton(cx: Scope<InputButtonParams>) -> Element {
                     "application/json".parse().unwrap(),
                 );
                 let response = client
-                    .post(&users_endpoint())
+                    .post(&guests_endpoint())
                     .headers(headers)
                     .json(&user)
                     .send()

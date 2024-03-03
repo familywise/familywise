@@ -20,7 +20,7 @@ fn HomeContent(cx: Scope<HomeContentProps>) -> Element {
         class: cx.props.class.as_str(),
         MenuItems {}
         Parent { "Welcome to FamilyWise!" }
-        Footer { "This is the home page." }
+        Footer { Status { } }
     }
       ))
 }

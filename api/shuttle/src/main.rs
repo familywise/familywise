@@ -1,5 +1,5 @@
 use anyhow::anyhow;
-use api_lib::prelude::*;
+use cordial::prelude::*;
 use shuttle_runtime::CustomError;
 use shuttle_secrets::SecretStore;
 use sqlx::{Executor, PgPool};
@@ -18,8 +18,11 @@ async fn axum(
     pool.execute(include_str!("../schema.sql"))
         .await
         .map_err(CustomError::new)?;
-    let router = AppState::new(pool).app();
+
+    let mut host = Host::from_env().await.unwrap();
+    host.recall = Recall::new(pool);
+    let app = host.bearing();
 
     info!("🚀 Server started successfully");
-    Ok(router.into())
+    Ok(app.into())
 }
