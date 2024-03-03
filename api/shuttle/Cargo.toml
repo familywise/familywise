@@ -7,7 +7,7 @@ edition = "2021"
 anyhow = { workspace = true }
 axum = { workspace = true }
 axum-server.workspace = true 
-cordial = { path = "../../../cordial" }
+cordial = { git = "https://github.com/crumplecup/cordial.git" }
 fake.workspace = true 
 reqwest.workspace = true
 shared = { path = "../../shared", features = ["backend"] }
@@ -19,7 +19,6 @@ secrecy.workspace = true
 serde_json = { workspace = true }
 sqlx = { workspace = true }
 tokio = { workspace = true }
-# tower-http = { workspace = true }
 tracing = { workspace = true }
 tracing-subscriber = { workspace = true }
 uuid = { workspace = true }

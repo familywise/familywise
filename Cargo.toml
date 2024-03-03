@@ -32,13 +32,12 @@ shuttle-axum = "0.39.0"
 shuttle-runtime = "0.39.0"
 shuttle-secrets = "0.39.0"
 shuttle-service = { version = "0.39.0", features = ["tokio"] }
-shuttle-shared-db = { version = "0.39.0", features = ["postgres", "sqlx"] }
+shuttle-shared-db = { version = "0.39.0", features = ["postgres-rustls", "sqlx"] }
 sqlx = { version = "0.7.1", features = ["runtime-tokio-rustls", "postgres", "macros", "chrono", "uuid"] }
 thiserror = "1.0.50"
 tokio = { version = "1.28.2", features = ["fs", "tracing"] }
 tower = { version = "0.4.13", features = ["tracing", "tokio"] }
 tower-http = { version = "0.5.0", features = ["fs", "tracing", "tokio"] }
-# tower-http = { version = "0.4.4", features = ["fs", "tracing", "tokio"] }
 tracing = "0.1.37"
 tracing-subscriber = "0.3.17"
 uuid = { version = "1.5.0", features = ["js", "v4"] }

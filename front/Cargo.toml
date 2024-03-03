@@ -12,12 +12,12 @@ name = "familywise_client"
 
 [dependencies]
 # cordial = { git = "https://github.com/crumplecup/cordial.git", default-features = false, features = ["uuid"] }
-cordial_guest = { path = "../../cordial/cordial_guest" }
+cordial_guest = { git = "https://github.com/crumplecup/cordial.git" }
 dioxus.workspace = true
 dioxus-router.workspace = true
 dioxus-web.workspace = true
 log.workspace = true
-polite = { path = "../../cordial/polite", default-features = false, features = ["req"] }
+polite = { git = "https://github.com/crumplecup/cordial.git", default-features = false, features = ["req"] }
 prefers-color-scheme.workspace = true
 reqwest.workspace = true
 serde_json.workspace = true
